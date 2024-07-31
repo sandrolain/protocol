@@ -1,12 +1,12 @@
 # Structured LIghtweight MEssage Protocol (SLiMe)
 
-L'obiettivo che si pone il protocollo SLiMe è di fornire uno metodo di comunicazione leggero per canali basati su TCP o UDP.
+The purpose of the SLiMe (Structured Lightweight Message Protocol) is to provide a lightweight communication method for channels based on TCP or UDP.
 
-Il protocollo definisce principalmente tre parti:
+The protocol primarily consists of three parts:
 
-- un header e alcune sequenze opzionali contenenti le informazioni sull'interpretazione del messaggio
-- un formato per la serializzazione del payload che permetta di definire dati semi-strutturati
-- un crc per la validazione e/o signature del messaggio
+- a header and optional sequences that contain information about message interpretation
+- a format for serializing the payload that allows for semi-structured data definition
+- a crc for message validation or signature
 
 ## Message Format
 
@@ -92,29 +92,32 @@ Il protocollo definisce principalmente tre parti:
   </tbody>
 </table>
 
-## Header
+### Header
 
-### Version
+#### Version
 
-I bit 0-2 bit dell'header (i primi 3 bit del primo byte) indicano la versione del protocollo. I valori possibili rientrano nel range 0-7.
+The bits 0-2 of the header (the first 3 bits of the first byte) indicate the version of the protocol.  
+The possible values range from 0 to 7.
 
-### CRC Flag
+#### CRC Flag
 
-Il bit 3 dell'header indica se è presente il CRC alla fine del messaggio.
-Valore 0 indica assenza del CRC, valore 1 indica la presenza del CRC.
+The 3rd bit of the header indicates if there is a CRC at the end of the message:
 
-### Message Type
+- `0`: no CRC
+- `1`: with CRC
 
-Il tipo di messaggio è identificato da una sequenza di 4 bit.
+#### Message Type
 
-Il primo bit indica se il messaggio è una richiesta o una risposta:
+The message type is identified by a sequence of 4 bits.
 
-- `0` = richiesta
-- `1` = risposta
+The first bit indicates whether the message is a request or a response:
 
-I successivi 3 bit indicato il tipo di richiesta o di risposta.
+- `0`: request
+- `1`: response
 
-I valori per i messaggi di richiesta sono:
+The next 3 bits indicate the type of request or response.
+
+The values for request messages are:
 
 - `0b0000`: GENERIC / UNDEFINED
 - `0b0001`: GET
@@ -125,10 +128,10 @@ I valori per i messaggi di richiesta sono:
 - `0b0110`: ???
 - `0b0111`: ???
 
-I valori per i messaggi di risposta sono:
+The values for response messages are:
 
-- `0b1000`: OK (previsto payload)
-- `0b1001`: ACCEPTED (non deve essere presente payload)
+- `0b1000`: OK (With payload)
+- `0b1001`: ACCEPTED (No payload present)
 - `0b1010`: INVALID REQUEST
 - `0b1011`: UNAUTHORIZED
 - `0b1100`: FORBIDDEN
@@ -136,33 +139,33 @@ I valori per i messaggi di risposta sono:
 - `0b1110`: TIMEOUT
 - `0b1111`: SERVER ERROR
 
-### ID Length
+#### ID Length
 
-I bit 8-11 dell'header (primi 4 bit del secondo byte) indicano la lunghezza in byte dell'ID del messaggio.  
-I valori possibili rientrano nel range 0-8.
+The bits 8-11 of the header (the first 4 bits of the second byte) indicate the length in bytes of the message ID.  
+The possible values range from 0 to 8.
 
-### Schema Length
+#### Schema Length
 
-I bit 12-15 dell'header (ultimi 4 bit del secondo byte) indicano la lunghezza in byte dello schema del messaggio.  
-I valori possibili rientrano nel range 0-8.
+The bits 12-15 of the header (the last 4 bits of the second byte) indicate the length in bytes of the message schema.
+The possible values range from 0 to 8.
 
-## Message ID
+### Message ID
 
 L'ID del messaggio è una sequenza di byte che serve a identificare l'univocità del messaggio ed eventualmente ad identificare un messaggio di risposta al relativo messaggio di richiesta. La sequenza di byte può essere intepretata come valore numerico o come stringa.  
 La lunghezza dell'ID è variabile tra 0 e 8 byte e dipende da quanto indicato nell'apposita sezione dell'header.
 
-## Message Schema
+### Message Schema
 
 Lo schema del messaggio è una sequenza di byte che serve a identificare il tipo di struttura dati ed il significato dei valori del payload. La sequenza di byte può essere intepretata come valore numerico o come stringa.  
 La lunghezza dello schema è variabile tra 0 e 8 byte e dipende da quanto indicato nell'apposita sezione dell'header.
 
-## Payload
+### Payload
 
-Il payload è composto da una sequenza di parametri suddivisi in coppie chiave e valore.
+The payload is composed of a sequence of parameters divided into key-value pairs.
 
-La chiave ha dimensione 2 byte, mentre il valore ha dimensione variabile.
+The key has a size of 2 bytes, while the value has a variable size.
 
-I primi 4 bit della chiave indicano il tipo del valore:
+The first 4 bits of the key indicate the type of the value:
 
 - `0b0000`: bool (1 byte, valori ammessi 0x00 e 0x01)
 - `0b0001`: int8 (1 byte)
@@ -180,94 +183,98 @@ I primi 4 bit della chiave indicano il tipo del valore:
 - `0b1110`: array (type and length specified by 2 byte with same logic of Param ID)
 - `0b1111`: map (length specified by 2 byte)
 
-I successivi 12 bit della chiave indicano l'ID del parametro, che può essere un numero intero da 0 a 4095.
+The following 12 bits of the key indicate the parameter ID, which can be an integer from 0 to 4095.
 
-Il valore del parametro è specificato in base al tipo indicato nella chiave.
+The value of the parameter is specified based on the type indicated in the key.
 
-### bool
+#### bool
 
 Il tipo `bool` ammette due valori:
 
 - `0x00`: false
 - `0x01`: true
 
-### int8
+#### int8
 
-Il tipo `int8` richiede 1 byte e ammette un valore con segno da `-127` a `127`.
+The `int8` type requires 1 byte and allows for a signed integer value ranging from -127 to 127.
 
-### int16
+#### int16
 
-Il tipo `int16` richiede 2 byte e ammette un valore con segno da `-32_767` a `32_767`.
+The `int16` type requires 2 bytes and allows for a signed integer value ranging from -32_767 to 32_767.
 
-### int32
+#### int32
 
-Il tipo `int32` richiede 4 byte e ammette un valore con segno da `-2_147_483_647` a `2_147_483_647`.
+The `int32` type requires 4 bytes and allows for a signed integer value ranging from -2_147_483_647 to 2_147_483_647.
 
-### int64
+#### int64
 
-Il tipo `int64` richiede 8 byte e ammette un valore con segno da `-9_223_372_036_854_775_807` a `9_223_372_036_854_775_807`.
+The `int64` type requires 8 bytes and allows for a signed integer value ranging from -9_223_372_036_854_775_807 to 9_223_372_036_854_775_807.
 
-### float
+#### float
 
-Il tipo `float` richiede 4 byte e ammette un valore con segno da //TODO.
+The `float` type requires 4 bytes and allows for a signed floating-point value.
 
-### double
+#### double
 
-Il tipo `double` richiede 8 byte e ammette un valore con segno da //TODO.
+The `double` type requires 8 bytes and allows for a signed floating-point value.
 
-### short binary
+#### short binary
 
-Il tipo `short binary` è formato da un numero variabile di byte.  
-Il primo byte indica la lunghezza in byte del valore (da 0 a 255), seguito dalla sequenza di byte.
+The `short binary` type is formed by a variable number of bytes.
+The first byte indicates the length in bytes of the value (from 0 to 255), followed by the byte sequence.
 
-### medium binary
+#### medium binary
 
-Il tipo `medium binary` è formato da un numero variabile di byte.
-I primi 2 byte indicano la lunghezza in byte del valore (da 0 a 65_535), seguito dalla sequenza di byte.
+The `medium binary` type is formed by a variable number of bytes.
+The first 2 bytes indicate the length in bytes of the value (from 0 to 65_535), followed by the byte sequence.
 
-### long binary
+#### long binary
 
-Il tipo `long binary` è formato da un numero variabile di byte.  
-I primi 4 byte indicano la lunghezza in byte del valore (da 0 a 4_294_967_295), seguito dalla sequenza di byte.
+The `long binary` type is formed by a variable number of bytes.
+The first 4 bytes indicate the length in bytes of the value (from 0 to 4_294_967_295), followed by the byte sequence.
 
-### short text
+#### short text
 
-Il tipo `short text` è formato da un numero variabile di byte.  
-Il primo byte indica la lunghezza in byte del valore (da 0 a 255), seguito dalla sequenza di byte.  
-Strutturalmente uguale a `short binary`, il valore va interpretato come stringa UTF-8.
+The `short text` type is formed by a variable number of bytes.
+The first byte indicates the length in bytes of the value (from 0 to 255), followed by the byte sequence.
+Structurally equivalent to `short binary`, the value should be interpreted as a UTF-8 string.
 
-### medium text
+#### medium text
 
-Il tipo `medium text` è formato da un numero variabile di byte.  
-I primi 2 byte indicano la lunghezza in byte del valore (da 0 a 65_535), seguito dalla sequenza di byte.  
-Strutturalmente uguale a `medium binary`, il valore va interpretato come stringa UTF-8.
+The `medium text` type is formed by a variable number of bytes.
+The first 2 bytes indicate the length in bytes of the value (from 0 to 65_535), followed by the byte sequence.  
+Structurally equivalent to `medium binary`, the value should be interpreted as a UTF-8 string.
 
-### long text
+#### long text
 
-Il tipo `long text` è formato da un numero variabile di byte.  
-I primi 4 byte indicano la lunghezza in byte del valore (da 0 a 4_294_967_295), seguito dalla sequenza di byte.  
-Strutturalmente uguale a `long binary`, il valore va interpretato come stringa UTF-8.
+The `long text` type is formed by a variable number of bytes.
+The first 4 bytes indicate the length in bytes of the value (from 0 to 4_294_967_295), followed by the byte sequence.
+Structurally equivalent to `long binary`, the value should be interpreted as a UTF-8 string.
 
-### array
+#### array
 
-Il tipo `array` è formato da un numero variabile di byte.
-I primi 2 byte indicano il tipo degli elementi e la lunghezza dell'array.
-Il formato dei primi 2 byte è simile a quello della chiave dei parametri del payload:
+The type `array` is formed by a variable number of bytes.
+The first 2 bytes indicate the type of the elements and the length of the array.
+The format of the first 2 bytes is similar to that of the key of the payload parameters:
 
-- i primi 4 bit indicano il tipo degli elementi dell'array
-- i successivi 12 bit indicano il numero di elementi nell'array (da 0 a 4095)
+- The first 4 bits indicate the type of the elements in the array
+- The following 12 bits indicate the number of elements in the array (from 0 to 4095)
 
-### map
+#### map
 
-Il tipo `map` è formato da un numero variabile di byte.  
-I primi 2 byte indicano la lunghezza della mappa (da 0 a 65_535).  
-La successiva sequenza di byte è una sequenza di parametri, per un numero equivalente alla lunghezza indicata nei primi due byte, che rappresenta le coppie chiave-valore della mappa.  
-La sequenza di parametri della mappa è strutturalmente equivalente a quella del payload principale; puà pertanto contenere a sua volta sotto-strutture di tipo `array` e `map`.
+The type `map` is formed by a variable number of bytes.  
+The first 2 bytes indicate the length of the map (from 0 to 65_535).  
+The subsequent bytes are a sequence of parameters, equivalent in number to the length indicated in the first 2 bytes, which represents the key-value pairs of the map.  
+The parameter sequence of the map is structurally equivalent to the main payload; it may therefore contain sub-structures of type `array` and `map`.
 
-## CRC
+### CRC
 
-Il CRC è una sequenza di 4 byte (CRC-32) posta al termine del messaggio.
-La presenza del CRC è opzionale ed è indicata nell'apposito bit dell'header.
+The CRC is a sequence of 4 bytes (CRC-32) placed at the end of the message.
+The presence of the CRC is optional and is indicated in the corresponding bit of the header.
+
+## Message Schema Description
+
+The message schema is an optional identifier that is useful for validating and identifying the message parameters.
 
 ----
 
