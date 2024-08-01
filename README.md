@@ -189,7 +189,7 @@ The value of the parameter is specified based on the type indicated in the key.
 
 #### bool
 
-Il tipo `bool` ammette due valori:
+The `bool` type admits two values:
 
 - `0x00`: false
 - `0x01`: true
