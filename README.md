@@ -276,6 +276,26 @@ The presence of the CRC is optional and is indicated in the corresponding bit of
 
 The message schema is an optional identifier that is useful for validating and identifying the message parameters.
 
+Example:
+
+```json
+{
+  "$schema": "...", // wip
+  "$slime": {
+    "id": 1, // optional, if specified, must match the schema ID of the message
+    "parameters": [
+      {
+        "id": 1, // required
+        "name": "id", // required
+        "type": "int32",  // optional, if specified, must match the type of the parameter
+        "required": true // optional, if specified, the parameter must be present in the message
+      }
+    ]
+  }
+}
+
+```
+
 ----
 
 - 2 byte: protocl header
