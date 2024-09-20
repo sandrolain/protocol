@@ -151,13 +151,13 @@ The possible values range from 0 to 8.
 
 ### Message ID
 
-L'ID del messaggio è una sequenza di byte che serve a identificare l'univocità del messaggio ed eventualmente ad identificare un messaggio di risposta al relativo messaggio di richiesta. La sequenza di byte può essere intepretata come valore numerico o come stringa.  
-La lunghezza dell'ID è variabile tra 0 e 8 byte e dipende da quanto indicato nell'apposita sezione dell'header.
+The message ID is a sequence of bytes that serves to identify the uniqueness of the message and possibly to identify a response message to the related request message. The sequence of bytes can be interpreted as a numerical value or as a string.  
+The length of the ID is variable between 0 and 8 bytes and depends on what is indicated in the appropriate section of the header.
 
 ### Message Schema
 
-Lo schema del messaggio è una sequenza di byte che serve a identificare il tipo di struttura dati ed il significato dei valori del payload. La sequenza di byte può essere intepretata come valore numerico o come stringa.  
-La lunghezza dello schema è variabile tra 0 e 8 byte e dipende da quanto indicato nell'apposita sezione dell'header.
+The message schema is a sequence of bytes that serves to identify the type of data structure and the meaning of the payload values. The sequence of bytes can be interpreted as a numerical value or as a string.  
+The length of the schema is variable between 0 and 8 bytes and depends on what is indicated in the appropriate section of the header.
 
 ### Payload
 
